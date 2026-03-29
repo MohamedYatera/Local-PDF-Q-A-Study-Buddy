@@ -1,0 +1,57 @@
+[
+  {
+    "question": "What is the time complexity of binary search in a sorted array?",
+    "expected_answer_contains": ["O(log n)", "binary search"],
+    "expected_citations": [
+      {
+        "doc_name": "dsa-lecture-02.pdf",
+        "page": 6
+      }
+    ],
+    "allow_not_enough_evidence": false
+  },
+  {
+    "question": "What is the difference between a stack and a queue?",
+    "expected_answer_contains": ["LIFO", "FIFO"],
+    "expected_citations": [
+      {
+        "doc_name": "dsa-lecture-01.pdf",
+        "page": 3
+      }
+    ],
+    "allow_not_enough_evidence": false
+  },
+  {
+    "question": "When is merge sort preferred over bubble sort according to the notes?",
+    "expected_answer_contains": ["merge sort", "O(n log n)", "bubble sort"],
+    "expected_citations": [
+      {
+        "doc_name": "dsa-lecture-04.pdf",
+        "page": 8
+      }
+    ],
+    "allow_not_enough_evidence": false
+  },
+  {
+    "question": "What property must a binary search tree satisfy?",
+    "expected_answer_contains": ["left subtree", "right subtree", "smaller", "greater"],
+    "expected_citations": [
+      {
+        "doc_name": "dsa-lecture-05.pdf",
+        "page": 4
+      }
+    ],
+    "allow_not_enough_evidence": false
+  },
+  {
+    "question": "What are the main steps of breadth-first search?",
+    "expected_answer_contains": ["queue", "visit", "neighbors"],
+    "expected_citations": [
+      {
+        "doc_name": "dsa-lecture-07.pdf",
+        "page": 10
+      }
+    ],
+    "allow_not_enough_evidence": false
+  }
+]

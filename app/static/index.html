@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Local PDF Q&A Study Buddy</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Private RAG for Coursework</p>
+          <h1>Local PDF Q&amp;A Study Buddy</h1>
+          <p class="hero-text">
+            Upload lecture PDFs, ask exam-style questions, and get grounded answers with page-level citations only.
+          </p>
+        </div>
+        <div class="status-panel">
+          <h2>System Status</h2>
+          <dl id="health-grid" class="health-grid">
+            <div>
+              <dt>Ollama</dt>
+              <dd id="ollama-status">Checking...</dd>
+            </div>
+            <div>
+              <dt>Generator</dt>
+              <dd id="generation-model">-</dd>
+            </div>
+            <div>
+              <dt>Embeddings</dt>
+              <dd id="embedding-model">-</dd>
+            </div>
+            <div>
+              <dt>Indexed Docs</dt>
+              <dd id="indexed-docs">0</dd>
+            </div>
+          </dl>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>1. Upload PDFs</h2>
+            <p>Documents stay on your machine in the local storage folder.</p>
+          </div>
+          <form id="upload-form" class="stack">
+            <label class="file-drop">
+              <input id="pdf-input" type="file" accept="application/pdf" multiple />
+              <span id="pdf-label-text">Select one or more PDF files</span>
+            </label>
+            <button type="submit" class="button">Index Documents</button>
+          </form>
+          <p id="upload-message" class="helper-text"></p>
+          <div class="documents-header">
+            <h3>Indexed Documents</h3>
+            <button id="refresh-docs" class="button button-secondary" type="button">Refresh</button>
+          </div>
+          <div id="documents-list" class="document-list empty-state">No documents indexed yet.</div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <h2>2. Ask a Question</h2>
+            <p>The assistant can only answer from retrieved chunks. No outside facts are allowed.</p>
+          </div>
+          <form id="query-form" class="stack">
+            <label>
+              <span class="label">Question</span>
+              <textarea
+                id="question-input"
+                rows="4"
+                placeholder="Example: What are the three stages of mitosis discussed in the slides?"
+              ></textarea>
+            </label>
+            <label>
+              <span class="label">Top-k retrieval</span>
+              <input id="topk-input" type="number" min="1" max="12" value="6" />
+            </label>
+            <button type="submit" class="button">Ask Study Buddy</button>
+          </form>
+          <p id="query-message" class="helper-text"></p>
+
+          <div id="answer-shell" class="answer-shell hidden">
+            <div class="answer-block">
+              <div class="answer-meta">
+                <span id="evidence-badge" class="badge">Pending</span>
+                <span id="latency-text" class="muted-text"></span>
+              </div>
+              <h3>Answer</h3>
+              <div id="answer-text" class="answer-text"></div>
+            </div>
+
+            <div class="source-columns">
+              <div>
+                <h3>Citations</h3>
+                <div id="citations-list" class="citation-list empty-state">No citations yet.</div>
+              </div>
+              <div>
+                <h3>Retrieved Context</h3>
+                <div id="retrieved-list" class="retrieved-list empty-state">Ask a question to inspect retrieval.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel-wide">
+          <div class="panel-heading">
+            <h2>3. Run an Evaluation Set</h2>
+            <p>Upload a JSON file with 30-50 exam questions to measure citation quality, support, and latency.</p>
+          </div>
+          <form id="evaluation-form" class="stack stack-inline">
+            <label class="file-drop file-drop-small">
+              <input id="evaluation-input" type="file" accept="application/json" />
+              <span id="evaluation-label-text">Select evaluation JSON</span>
+            </label>
+            <label class="toggle-row">
+              <input id="evaluation-fast-mode" type="checkbox" checked />
+              <span>Fast mode: skip support check</span>
+            </label>
+            <button id="evaluation-run-button" type="submit" class="button">Run Evaluation</button>
+          </form>
+          <p id="evaluation-message" class="helper-text"></p>
+          <div id="evaluation-summary" class="evaluation-summary hidden"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

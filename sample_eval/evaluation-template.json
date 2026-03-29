@@ -1,0 +1,31 @@
+[
+  {
+    "question": "What definition does the instructor give for supervised learning?",
+    "expected_answer_contains": ["supervised learning", "labeled"],
+    "expected_citations": [
+      {
+        "doc_name": "lecture-01.pdf",
+        "page": 4
+      }
+    ],
+    "allow_not_enough_evidence": false
+  },
+  {
+    "question": "What are the three assumptions listed for the proof?",
+    "expected_answer_contains": ["assumption"],
+    "expected_citations": [
+      {
+        "doc_name": "lecture-03.pdf",
+        "page": 11
+      }
+    ],
+    "allow_not_enough_evidence": false
+  },
+  {
+    "question": "What is the exact due date for the optional extra credit assignment?",
+    "expected_answer_contains": [],
+    "expected_citations": [],
+    "allow_not_enough_evidence": true
+  }
+]
+
