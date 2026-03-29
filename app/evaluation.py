@@ -24,9 +24,10 @@ def run_evaluation(
     support_check_enabled: bool = True,
 ) -> EvaluationSummary:
     cases: list[EvaluationCaseResult] = []
+    evaluation_top_k = settings.default_top_k if support_check_enabled else settings.evaluation_top_k
 
     for item in items:
-        response = rag_service.answer_question(item.question)
+        response = rag_service.answer_question(item.question, top_k=evaluation_top_k)
         keyword_score = _keyword_score(response.answer, item.expected_answer_contains)
         citation_recall, citation_precision = _citation_scores(response.citations, item.expected_citations)
         if support_check_enabled:
@@ -93,6 +94,7 @@ def write_report(summary: EvaluationSummary, settings: Settings) -> Path:
         ),
         f"- Average latency (ms): {summary.average_latency_ms:.2f}",
         f"- Support check enabled: {summary.support_check_enabled}",
+        f"- Evaluation top-k: {settings.default_top_k if summary.support_check_enabled else settings.evaluation_top_k}",
         "",
         "## Case Details",
         "",

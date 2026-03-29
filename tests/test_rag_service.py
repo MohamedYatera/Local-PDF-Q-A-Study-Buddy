@@ -19,11 +19,13 @@ class DummyStore:
 
 
 class DummyOllama:
-    def __init__(self, answer_result: OllamaAnswerResult):
+    def __init__(self, answer_result):
         self.answer_result = answer_result
 
     def generate_json(self, system_prompt: str, user_prompt: str):
-        return self.answer_result.model_dump()
+        if isinstance(self.answer_result, OllamaAnswerResult):
+            return self.answer_result.model_dump()
+        return self.answer_result
 
 
 def build_chunk(source_id: str, score: float) -> RetrievedChunk:
@@ -79,4 +81,3 @@ def test_single_strong_chunk_counts_as_enough_evidence():
 
     assert response.enough_evidence is True
     assert response.answer.startswith("It is supported")
-

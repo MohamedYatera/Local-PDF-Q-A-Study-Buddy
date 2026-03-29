@@ -9,8 +9,10 @@ from app.schemas import Citation, EvaluationCitation, EvaluationItem, QueryRespo
 class DummyRAGService:
     def __init__(self) -> None:
         self.judge_calls = 0
+        self.last_top_k = None
 
     def answer_question(self, question: str, top_k: int | None = None) -> QueryResponse:
+        self.last_top_k = top_k
         chunk = RetrievedChunk(
             source_id="S1",
             doc_id="doc-1",
@@ -43,7 +45,7 @@ class DummyRAGService:
 
 
 def test_run_evaluation_fast_mode_skips_support_check(tmp_path: Path):
-    settings = type("Settings", (), {"reports_dir": tmp_path})
+    settings = type("Settings", (), {"reports_dir": tmp_path, "default_top_k": 6, "evaluation_top_k": 3})
     rag_service = DummyRAGService()
     items = [
         EvaluationItem(
@@ -65,4 +67,4 @@ def test_run_evaluation_fast_mode_skips_support_check(tmp_path: Path):
     assert summary.unsupported_claim_rate is None
     assert summary.cases[0].supported is None
     assert rag_service.judge_calls == 0
-
+    assert rag_service.last_top_k == 3

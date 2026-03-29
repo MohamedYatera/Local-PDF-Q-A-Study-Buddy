@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 import time
 
+from pydantic import ValidationError
+
 from app.config import Settings
 from app.ollama_client import OllamaService, OllamaServiceError
 from app.schemas import Citation, OllamaAnswerResult, OllamaJudgeResult, QueryResponse, RetrievedChunk
@@ -78,7 +80,10 @@ class RAGService:
         )
 
         payload = self.ollama.generate_json(system_prompt, user_prompt)
-        return OllamaJudgeResult.model_validate(payload)
+        try:
+            return OllamaJudgeResult.model_validate(payload)
+        except ValidationError as exc:
+            raise OllamaServiceError("The model returned an invalid support-check response.") from exc
 
     def _has_enough_evidence(self, retrieved: list[RetrievedChunk]) -> bool:
         if not retrieved:
@@ -108,7 +113,10 @@ class RAGService:
             '}'
         )
         payload = self.ollama.generate_json(system_prompt, user_prompt)
-        return OllamaAnswerResult.model_validate(payload)
+        try:
+            return OllamaAnswerResult.model_validate(payload)
+        except ValidationError as exc:
+            raise OllamaServiceError("The model returned an invalid answer format.") from exc
 
     def _build_context(self, retrieved: list[RetrievedChunk]) -> str:
         blocks: list[str] = []

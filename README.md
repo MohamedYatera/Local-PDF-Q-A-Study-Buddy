@@ -27,7 +27,7 @@ Local-first study assistant for course PDFs. It indexes uploaded lecture notes, 
 - These Ollama models pulled before running the app:
 
 ```powershell
-ollama pull llama3.1:8b
+ollama pull llama3.2
 ollama pull nomic-embed-text
 ```
 
@@ -48,17 +48,31 @@ Open `http://127.0.0.1:8000`.
 Environment variables live in `.env`.
 
 - `OLLAMA_BASE_URL`: default `http://127.0.0.1:11434`
-- `OLLAMA_GENERATION_MODEL`: default `llama3.1:8b`
+- `OLLAMA_GENERATION_MODEL`: default `llama3.2`
 - `OLLAMA_EMBEDDING_MODEL`: default `nomic-embed-text`
 - `OLLAMA_EMBED_TIMEOUT_SECONDS`: default `120`
 - `OLLAMA_GENERATION_TIMEOUT_SECONDS`: default `300`
 - `CHUNK_SIZE_WORDS`: default `350`
 - `CHUNK_OVERLAP_WORDS`: default `70`
 - `DEFAULT_TOP_K`: default `6`
-- `MIN_RELEVANT_CHUNKS`: default `2`
-- `MIN_SIMILARITY_SCORE`: default `0.45`
+- `EVALUATION_TOP_K`: default `3`
+- `MIN_RELEVANT_CHUNKS`: default `1`
+- `MIN_SIMILARITY_SCORE`: default `0.3`
+
+Quick explanation:
+
+- `top-k` is how many chunks the app retrieves before it tries to answer. A bigger `k` gives more context, but it is slower and can bring in extra noise. I recommend 2-4 for smaller quick stuff.
+- `EVALUATION_TOP_K` is a smaller top-k used by fast evaluation mode so it runs quicker than normal question answering.
+- `MIN_SIMILARITY_SCORE` is the minimum relevance score a chunk should have before the app treats it as usable evidence. Higher means stricter; lower means more flexible.
 
 ## Evaluation dataset format
+
+What the evaluation set is for:
+
+- The evaluation set is a test file made of many questions and expected answers/citations.
+- It lets you measure how well the app performs instead of testing one question at a time by hand.
+- The app uses it to check answer quality, citation quality, and latency.
+- In fast mode, it skips the extra support-check step so the evaluation finishes sooner.
 
 Use a JSON array like [`sample_eval/evaluation-template.json`](/c:/Users/yater/Documents/GitHub/Local%20PDF%20Q&A%20Study%20Buddy/sample_eval/evaluation-template.json).
 
@@ -94,6 +108,13 @@ Fast evaluation mode:
 - The UI defaults to a faster evaluation mode that skips the extra LLM support-check pass.
 - Fast mode still measures keyword coverage, citation overlap, and latency.
 - Full mode is slower, but it also estimates unsupported-claim rate.
+
+What the extra support check means:
+
+- In full evaluation mode, the app makes a second AI call after answering.
+- That second call checks whether the answer is actually supported by the retrieved PDF text.
+- This helps estimate hallucinations and unsupported claims.
+- Fast mode skips this second check to save time.
 
 ## Testing
 

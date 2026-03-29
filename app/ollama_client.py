@@ -81,10 +81,53 @@ class OllamaService:
             raise OllamaServiceError("Generation response was empty.")
 
         try:
-            return json.loads(content)
+            parsed = json.loads(content)
         except json.JSONDecodeError:
             start = content.find("{")
             end = content.rfind("}")
             if start == -1 or end == -1 or end <= start:
                 raise OllamaServiceError(f"Invalid JSON from model: {content}")
-            return json.loads(content[start : end + 1])
+            parsed = json.loads(content[start : end + 1])
+
+        return _normalize_model_json(parsed)
+
+
+def _normalize_model_json(payload: Any) -> dict[str, Any]:
+    if isinstance(payload, dict) and (
+        {"answer", "enough_evidence"} <= payload.keys() or "supported" in payload or "unsupported_claims" in payload
+    ):
+        return payload
+
+    if isinstance(payload, dict):
+        for key in ("strictJSON", "json", "response", "data", "output", "result"):
+            if key not in payload:
+                continue
+            normalized = _coerce_nested_json(payload[key])
+            if normalized is not None:
+                return normalized
+
+        if len(payload) == 1:
+            normalized = _coerce_nested_json(next(iter(payload.values())))
+            if normalized is not None:
+                return normalized
+
+    raise OllamaServiceError(f"Model returned JSON in an unsupported shape: {payload}")
+
+
+def _coerce_nested_json(value: Any) -> dict[str, Any] | None:
+    if isinstance(value, dict):
+        try:
+            return _normalize_model_json(value)
+        except OllamaServiceError:
+            return None
+
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            return _normalize_model_json(json.loads(stripped))
+        except (json.JSONDecodeError, OllamaServiceError):
+            return None
+
+    return None
